@@ -1,0 +1,3 @@
+FROM busybox
+
+ADD ./binary-file/kube-scheduler /usr/bin/
