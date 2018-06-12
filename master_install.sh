@@ -99,16 +99,15 @@ install_kubectl()
 }
 
 get_ip
-echo $ip
 get_binary_file
-# install_docker
-# pull_basic_image
-# create_image
-# config_kubelet
-# config_etcd
-# config_apiserver
-# config_controllermanager
-# config_scheduler
-# config_proxy
-# start_kubelet
-# install_kubectl
+install_docker
+pull_basic_image
+create_image
+config_kubelet
+config_etcd
+config_apiserver
+config_controllermanager
+config_scheduler
+config_proxy
+start_kubelet
+install_kubectl
