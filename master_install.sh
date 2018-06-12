@@ -2,7 +2,7 @@
 
 
 host_ip=""
-host_name="master-node"
+host_name=""
 cluster_dns="10.10.10.2"
 cluster_ip_range="10.10.10.0"
 
@@ -13,6 +13,7 @@ get_ip()
 {
 	# 这里可能需要修改，不同主机ip地址不一样
 	host_ip=`ip addr | grep "global eth0" | awk '{print $2}' | awk -F '/' '{print $1}'`
+	host_name=$host_ip
 }
 
 get_binary_file()
@@ -30,6 +31,8 @@ install_docker()
 pull_basic_image()
 {
 	docker pull busybox
+	docker pull cnych/pause-amd64:3.1
+	docker tag cnych/pause-amd64:3.1 k8s.gcr.io/pause-amd64:3.1
 }
 
 create_image()
@@ -82,7 +85,7 @@ config_scheduler()
 
 config_proxy()
 {
-	sed "s/host_ip/$host_ip/g;s/$host_name/host_name/g" ./manifest/kube-proxy.yaml > ./manifest/kube-proxy.yaml.confed
+	sed "s/host_ip/$host_ip/g;s/host_name/$host_name/g" ./manifest/kube-proxy.yaml > ./manifest/kube-proxy.yaml.confed
 	cp ./manifest/kube-proxy.yaml.confed /etc/kube/manifest/kube-proxy.yaml
 }
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-etcd_url="https://github.com/coreos/etcd/releases/download/v3.3.7/etcd-v3.3.7-linux-amd64.tar.gz"
+etcd_url="https://github.com/coreos/etcd/releases/download/v3.2.9/etcd-v3.2.9-linux-amd64.tar.gz"
 k8s_url="https://dl.k8s.io/v1.10.0-beta.4/kubernetes-server-linux-amd64.tar.gz"
 
 get_file()
