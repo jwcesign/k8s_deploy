@@ -64,7 +64,7 @@ config_etcd()
 config_apiserver()
 {
 	sed "s/host_ip/$host_ip/g;s/cluster_ip_range/$cluster_ip_range/g" ./manifest/kube-apiserver.yaml > ./manifest/kube-apiserver.yaml.confed
-	cp ./manifest/kube-apiserver.yaml.confed /etc/manifest/kube-apiserver.yaml
+	cp ./manifest/kube-apiserver.yaml.confed /etc/kube/manifest/kube-apiserver.yaml
 }
 
 
