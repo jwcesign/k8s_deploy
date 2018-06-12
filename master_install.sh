@@ -2,7 +2,7 @@
 
 
 host_ip=""
-host_name="master_node"
+host_name="master-node"
 cluster_dns="10.10.10.2"
 cluster_ip_range="10.10.10.0"
 
