@@ -11,8 +11,8 @@ get_file()
 
 unzip_file()
 {
-	tar -zxvf etcd.tar.gz -C ./binary-file/
-	tar -zxvf k8s.tar.gz -C ./binary-file/
+	tar -zxvf ./binary-file/etcd.tar.gz -C ./binary-file/
+	tar -zxvf ./binary-file/k8s.tar.gz -C ./binary-file/
 }
 
 mv_file()
