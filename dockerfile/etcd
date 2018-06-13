@@ -1,4 +1,5 @@
 FROM busybox
 
+ADD ./conf/etcd.conf /etc/conf/
 ADD ./binary-file/etcd /usr/bin/
-add ./binary-file/etcdctl /usr/bin/
+ADD ./binary-file/etcdctl /usr/bin/

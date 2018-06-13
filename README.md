@@ -246,3 +246,11 @@ systemctl stop kube-proxy
 systemctl status kube-proxy
 systemctl status kubelet
 ~~~
+
+## 容器化安装
+* 安装主脚本：master_install.sh，注意其中的kube-proxy没有拉起，待完善（可以定制化参数）
+* manifest文件夹：各主机的yaml文件，可以修改以定制启动参数
+* dockerfile：docker build的各组件的dockerfile
+* conf: 各组件的启动参数设置
+* binary-file：获取各组件
+* 脚本比较简单，一看就懂，如果需要定制化脚本，可以自己添加类容

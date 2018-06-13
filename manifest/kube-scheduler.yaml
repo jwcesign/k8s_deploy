@@ -9,7 +9,7 @@ spec:
   - command:
     - sh
     - -c
-    - "kube-scheduler --master=http://host_ip:8080 &> /var/log/scheduler.log"
+    - "source /etc/conf/kube-scheduler.conf && kube-scheduler $ARGS >> /var/log/scheduler.log 2>&1"
     name: kube-scheduler
     image: docker.io/kube-scheduler:1.10
     volumeMounts:
