@@ -17,7 +17,7 @@ unzip_file()
 
 mv_file()
 {
-	mv ./binary-file/etcd-v3.3.7-linux-amd64/{etcd,etcdctl} ./binary-file/
+	mv ./binary-file/etcd-v3.2.9-linux-amd64/{etcd,etcdctl} ./binary-file/
 	mv ./binary-file/kubernetes/server/bin/{kube-apiserver,kube-controller-manager,kube-proxy,kube-scheduler,kubectl,kubelet} ./binary-file/
 }
 
