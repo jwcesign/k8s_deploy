@@ -9,7 +9,7 @@ spec:
   - command:
     - sh
     - -c
-    - "kube-proxy --master=http://host_ip:8080 --hostname-override=host_name --logtostderr=true --log-dir=/var/log/kubernetes --v=4 2>&1 > /var/log/proxy.log"
+    - "kube-proxy --master=http://host_ip:8080 --hostname-override=host_name --logtostderr=true --log-dir=/var/log/kubernetes --v=4 >> /var/log/proxy.log 2>&1"
     name: kube-proxy
     image: docker.io/kube-proxy:1.10
     volumeMounts:

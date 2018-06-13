@@ -9,7 +9,7 @@ spec:
   - command:
     - sh
     - -c
-    - "kube-controller-manager --master=http://host_ip:8080 2>&1 > /var/log/cm.log"
+    - "kube-controller-manager --master=http://host_ip:8080 >> /var/log/cm.log 2>&1"
     name: kube-cm
     image: docker.io/kube-controller-manager:1.10
     volumeMounts:

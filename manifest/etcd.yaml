@@ -9,7 +9,7 @@ spec:
   - command:
     - sh
     - -c
-    - "etcd --advertise-client-urls=http://host_ip:2379 --listen-client-urls=http://0.0.0.0:2379 --data-dir=/var/lib/etcd 2>&1 > /var/log/etcd.log"
+    - "etcd --advertise-client-urls=http://host_ip:2379 --listen-client-urls=http://0.0.0.0:2379 --data-dir=/var/lib/etcd >> /var/log/etcd.log 2>&1"
     name: etcd
     image: docker.io/etcd:3.2
     volumeMounts:
