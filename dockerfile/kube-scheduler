@@ -1,3 +1,6 @@
 FROM busybox
 
+
+
+ADD ./conf/kube-scheduler.conf /etc/conf/
 ADD ./binary-file/kube-scheduler /usr/bin/

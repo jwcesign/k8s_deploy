@@ -60,33 +60,33 @@ config_kubelet()
 
 config_etcd()
 {
-	sed "s/host_ip/$host_ip/g" ./manifest/etcd.yaml > ./manifest/etcd.yaml.confed
-	cp ./manifest/etcd.yaml.confed /etc/kube/manifest/etcd.yaml
+	sed "s/host_ip/$host_ip/g" ./conf/etcd.conf > ./conf/etcd.conf.confed
+	mv ./conf/etcd.conf.confed ./conf/etcd.conf
 }
 
 config_apiserver()
 {
-	sed "s/host_ip/$host_ip/g;s/cluster_ip_range/$cluster_ip_range/g" ./manifest/kube-apiserver.yaml > ./manifest/kube-apiserver.yaml.confed
-	cp ./manifest/kube-apiserver.yaml.confed /etc/kube/manifest/kube-apiserver.yaml
+	sed "s/host_ip/$host_ip/g;s/cluster_ip_range/$cluster_ip_range/g" ./conf/kube-apiserver.conf > ./conf/kube-apiserver.conf.confed
+	mv ./conf/kube-apiserver.conf.confed ./conf/kube-apiserver.conf
 }
 
 
 config_controllermanager()
 {
-	sed "s/host_ip/$host_ip/g" ./manifest/kube-controller-manager.yaml > ./manifest/kube-controller-manager.yaml.confed
-	cp ./manifest/kube-controller-manager.yaml.confed /etc/kube/manifest/kube-controller-manager.yaml
+	sed "s/host_ip/$host_ip/g" ./conf/kube-controller-manager.conf > ./conf/kube-controller-manager.conf.confed
+	mv ./conf/kube-controller-manager.conf.confed ./conf/kube-controller-manager.conf
 }
 
 config_scheduler()
 {
-	sed "s/host_ip/$host_ip/g" ./manifest/kube-scheduler.yaml > ./manifest/kube-scheduler.yaml.confed
-	cp ./manifest/kube-scheduler.yaml.confed /etc/kube/manifest/kube-scheduler.yaml
+	sed "s/host_ip/$host_ip/g" ./conf/kube-scheduler.conf > ./conf/kube-scheduler.conf.confed
+	mv ./conf/kube-controller-manager.conf.confed ./conf/kube-controller-manager.conf
 }
 
 config_proxy()
 {
-	sed "s/host_ip/$host_ip/g;s/host_name/$host_name/g" ./manifest/kube-proxy.yaml > ./manifest/kube-proxy.yaml.confed
-	cp ./manifest/kube-proxy.yaml.confed /etc/kube/manifest/kube-proxy.yaml
+	sed "s/host_ip/$host_ip/g;s/host_name/$host_name/g" ./conf/kube-proxy.conf > ./conf/kube-proxy.conf.confed
+	mv ./conf/kube-proxy.conf.confed ./conf/kube-proxy.conf
 }
 
 start_kubelet()
@@ -105,12 +105,13 @@ get_ip
 get_binary_file
 install_docker
 pull_basic_image
-create_image
 config_kubelet
 config_etcd
 config_apiserver
 config_controllermanager
 config_scheduler
-config_proxy
+create_image
+#这个暂时不能用
+#config_proxy
 start_kubelet
 install_kubectl
