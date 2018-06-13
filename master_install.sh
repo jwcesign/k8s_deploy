@@ -111,7 +111,7 @@ config_apiserver
 config_controllermanager
 config_scheduler
 create_image
-#这个暂时不能用
+#这个暂时不能用，拉起来后没有kube-proxy,需要设置iptables或者ipvs
 #config_proxy
 start_kubelet
 install_kubectl
