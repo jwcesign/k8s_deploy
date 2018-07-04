@@ -17,6 +17,15 @@ install_expect()
 	chmod +x ascp
 }
 
+get_binary_file()
+{
+	if [ -f ./binary-file/kubelet ]
+	then
+		pass
+	else
+		bash ./binary-file/get_file.sh
+	fi
+}
 
 set_master_ip()
 {
