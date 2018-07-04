@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+set timeout -1
+set file [lindex $argv 0]
+set ip [lindex $argv 1]
+set port [lindex $argv 2]
+set user [lindex $argv 3]
+set passwd [lindex $argv 4]
+set des [lindex $argv 5]
+spawn scp -P $port -r $file $user@$ip:$des
+expect {
+  "yes/no"
+  {send "yes\r"; exp_continue;}
+  "password:"
+  {send "$passwd\r";set timeout 0}
+}
+expect eof
+interact
+

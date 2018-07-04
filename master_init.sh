@@ -11,7 +11,7 @@ cluster_ip_range="10.10.10.0"
 
 get_ip()
 {
-	# 这里可能需要修改，不同主机ip地址不一样
+	# 这里可能需要修改，不同主机ip地址格式不一样
 	host_ip=`ip addr | grep "global eth0" | awk '{print $2}' | awk -F '/' '{print $1}'`
 	host_name=$host_ip
 }
@@ -41,21 +41,21 @@ create_image()
 	docker build -f ./dockerfile/etcd -t docker.io/etcd:3.2 .
 	docker build -f ./dockerfile/kube-scheduler -t docker.io/kube-scheduler:1.10 .
 	docker build -f ./dockerfile/kube-controller-manager -t docker.io/kube-controller-manager:1.10 .
-	docker build -f ./dockerfile/kube-proxy -t docker.io/kube-proxy:1.10 .
 }
 
 config_kubelet()
 {
 	sed "s/host_ip/$host_ip/g;s/host_name/$host_name/g;s/cluster_dns/$cluster_dns/g" ./conf/kubelet > ./conf/kubelet.confed
 	sed "s/host_ip/$host_ip/g" ./conf/kubelet.config > ./conf/kubelet.config.confed
-	mkdir -p /etc/kube/conf/
-	mkdir -p /etc/kube/manifest/ 
+	mkdir -p /etc/kubenetes/conf/
+	mkdir -p /etc/kubenetes/manifest/
+	cp ./manifest/*  /etc/kubenetes/manifest/
 	cp ./binary-file/kubelet /usr/bin/
 	chmod +x /usr/bin/kubelet
 	cp ./conf/kubelet.service /etc/systemd/system/
-	cp ./conf/{kubelet.confed,kubelet.config.confed} /etc/kube/conf/
-	mv /etc/kube/conf/kubelet.confed /etc/kube/conf/kubelet
-	mv /etc/kube/conf/kubelet.config.confed /etc/kube/conf/kubelet.config
+	cp ./conf/{kubelet.confed,kubelet.config.confed} /etc/kubenetes/conf/
+	mv /etc/kubenetes/conf/kubelet.confed /etc/kubenetes/conf/kubelet
+	mv /etc/kubenetes/conf/kubelet.config.confed /etc/kubenetes/conf/kubelet.config
 }
 
 config_etcd()
@@ -80,13 +80,7 @@ config_controllermanager()
 config_scheduler()
 {
 	sed "s/host_ip/$host_ip/g" ./conf/kube-scheduler.conf > ./conf/kube-scheduler.conf.confed
-	mv ./conf/kube-controller-manager.conf.confed ./conf/kube-controller-manager.conf
-}
-
-config_proxy()
-{
-	sed "s/host_ip/$host_ip/g;s/host_name/$host_name/g" ./conf/kube-proxy.conf > ./conf/kube-proxy.conf.confed
-	mv ./conf/kube-proxy.conf.confed ./conf/kube-proxy.conf
+	mv ./conf/kube-scheduler.conf.confed ./conf/kube-scheduler.conf
 }
 
 start_kubelet()
@@ -111,7 +105,5 @@ config_apiserver
 config_controllermanager
 config_scheduler
 create_image
-#这个暂时不能用，拉起来后没有kube-proxy,需要设置iptables或者ipvs
-#config_proxy
 start_kubelet
 install_kubectl

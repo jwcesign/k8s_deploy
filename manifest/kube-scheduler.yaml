@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: scheduler
+  name: kube-scheduler
   labels:
-    name: scheduler
+    name: kube-scheduler
 spec:
   containers:
   - command:

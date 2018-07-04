@@ -1,4 +1,0 @@
-FROM busybox
-
-ADD ./conf/kube-proxy.conf /etc/conf/
-ADD ./binary-file/kube-proxy /usr/bin/

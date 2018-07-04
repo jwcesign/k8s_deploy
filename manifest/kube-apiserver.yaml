@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: apiserver
+  name: kube-apiserver
   labels:
-    name: apiserver
+    name: kube-apiserver
 spec:
   containers:
   - command:
