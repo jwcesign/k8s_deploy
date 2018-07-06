@@ -9,7 +9,7 @@ spec:
   - command:
     - sh
     - -c
-    - 'source /etc/conf/kube-apiserver.conf && kube-apiserver $ARGS >> /var/log/apiserver.log 2>&1'
+    - 'kube-apiserver --insecure-bind-address=0.0.0.0 --insecure-port=8080 --etcd-servers=http://host_ip:2379 --service-cluster-ip-range=cluster_ip_range/24 --admission-control=NamespaceLifecycle,LimitRanger,ResourceQuota >> /var/log/kube-apiserver.log 2>&1'
     name: kube-apiserver
     image: docker.io/kube-apiserver:1.10
     volumeMounts:
@@ -17,7 +17,7 @@ spec:
       name: log
   volumes:
   - hostPath:
-      path: /home/log/
+      path: /var/log/kubernetes/
       type: DirectoryOrCreate
     name: log
   hostNetwork: true

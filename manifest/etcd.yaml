@@ -9,10 +9,17 @@ spec:
   - command:
     - sh
     - -c
-    - "source /etc/conf/etcd.conf && etcd $ARGS >> /var/log/etcd.log 2>&1"
+    - "etcd  --advertise-client-urls=$ADVERTISE_CLIENT_URLS --listen-client-urls=$LISTEN_CLIENT_URLS --data-dir=$DATA_DIR >> /var/log/etcd.log 2>&1"
     name: etcd
     image: docker.io/etcd:3.2
-    volumeMounts:
+    env:
+    - name: ADVERTISE_CLIENT_URLS
+      value: http://host_ip:2379
+    - name: LISTEN_CLIENT_URLS
+      value: http://0.0.0.0:2379
+    - name: DATA_DIR
+      value: /var/lib/etcd
+    volumeMounts: 
     - mountPath: /var/lib/etcd
       name: etcd-data
     - mountPath: /var/log/
@@ -23,7 +30,7 @@ spec:
       type: DirectoryOrCreate
     name: etcd-data
   - hostPath:
-      path: /home/log/
+      path: /var/log/kubernetes/
       type: DirectoryOrCreate
     name: log
   hostNetwork: true

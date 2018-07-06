@@ -9,7 +9,7 @@ spec:
   - command:
     - sh
     - -c
-    - "source /etc/conf/kube-controller-manager.conf && kube-controller-manager $ARGS >> /var/log/cm.log 2>&1"
+    - "kube-controller-manager --master=http://host_ip:8080 >> /var/log/kube-controller-manager.log 2>&1"
     name: kube-cm
     image: docker.io/kube-controller-manager:1.10
     volumeMounts:
@@ -17,7 +17,7 @@ spec:
       name: log
   volumes:
   - hostPath:
-      path: /home/log/
+      path: /var/log/kubernetes/
       type: DirectoryOrCreate
     name: log
   hostNetwork: true

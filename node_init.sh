@@ -29,14 +29,14 @@ config_kubelet()
 {
 	sed "s/host_name/$host_name/g;s/cluster_dns/$cluster_dns/g" ./conf/kubelet_node > ./conf/kubelet.confed
 	sed "s/master_ip/$master_ip/g" ./conf/kubelet_node.config > ./conf/kubelet.config.confed
-	mkdir -p /etc/kubenetes/conf/
-	mkdir -p /etc/kubenetes/manifest/ 
+	mkdir -p /etc/kubernetes/conf/
+	mkdir -p /etc/kubernetes/manifest/ 
 	cp ./kubelet /usr/bin/
 	chmod +x /usr/bin/kubelet
-	cp ./conf/kubelet.service /etc/systemd/system/
-	cp ./conf/{kubelet.confed,kubelet.config.confed} /etc/kubenetes/conf/
-	mv /etc/kubenetes/conf/kubelet.confed /etc/kubenetes/conf/kubelet
-	mv /etc/kubenetes/conf/kubelet.config.confed /etc/kubenetes/conf/kubelet.config
+	cp ./conf/kubelet.service /usr/lib/systemd/system/
+	cp ./conf/{kubelet.confed,kubelet.config.confed} /etc/kubernetes/conf/
+	mv /etc/kubernetes/conf/kubelet.confed /etc/kubernetes/conf/kubelet
+	mv /etc/kubernetes/conf/kubelet.config.confed /etc/kubernetes/conf/kubelet.config
 }
 
 start_kubelet()

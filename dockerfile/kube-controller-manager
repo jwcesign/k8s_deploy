@@ -1,5 +1,4 @@
 FROM busybox
 
 
-ADD ./conf/kube-controller-manager.conf /etc/conf/
 ADD ./binary-file/kube-controller-manager /usr/bin/

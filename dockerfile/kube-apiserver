@@ -1,4 +1,3 @@
 FROM busybox
 
-ADD ./conf/kube-apiserver.conf /etc/conf/
 ADD ./binary-file/kube-apiserver /usr/bin/

@@ -13,6 +13,7 @@ get_ip()
 {
 	# 这里可能需要修改，不同主机ip地址格式不一样
 	host_ip=`ip addr | grep "global eth0" | awk '{print $2}' | awk -F '/' '{print $1}'`
+	#host_ip="192.168.1.1"
 	host_name=$host_ip
 }
 
@@ -47,40 +48,45 @@ config_kubelet()
 {
 	sed "s/host_ip/$host_ip/g;s/host_name/$host_name/g;s/cluster_dns/$cluster_dns/g" ./conf/kubelet > ./conf/kubelet.confed
 	sed "s/host_ip/$host_ip/g" ./conf/kubelet.config > ./conf/kubelet.config.confed
-	mkdir -p /etc/kubenetes/conf/
-	mkdir -p /etc/kubenetes/manifest/
-	cp ./manifest/*  /etc/kubenetes/manifest/
+	mkdir -p /etc/kubernetes/conf/
+	mkdir -p /etc/kubernetes/manifest/
 	cp ./binary-file/kubelet /usr/bin/
 	chmod +x /usr/bin/kubelet
-	cp ./conf/kubelet.service /etc/systemd/system/
-	cp ./conf/{kubelet.confed,kubelet.config.confed} /etc/kubenetes/conf/
-	mv /etc/kubenetes/conf/kubelet.confed /etc/kubenetes/conf/kubelet
-	mv /etc/kubenetes/conf/kubelet.config.confed /etc/kubenetes/conf/kubelet.config
+	cp ./conf/kubelet.service /usr/lib/systemd/system/
+	cp ./conf/{kubelet.confed,kubelet.config.confed} /etc/kubernetes/conf/
+	mv /etc/kubernetes/conf/kubelet.confed /etc/kubernetes/conf/kubelet
+	mv /etc/kubernetes/conf/kubelet.config.confed /etc/kubernetes/conf/kubelet.config
 }
 
 config_etcd()
 {
-	sed "s/host_ip/$host_ip/g" ./conf/etcd.conf > ./conf/etcd.conf.confed
-	mv ./conf/etcd.conf.confed ./conf/etcd.conf
+	sed "s/host_ip/$host_ip/g" ./manifest/etcd.yaml > ./manifest/etcd.yaml.confed
+	mv ./manifest/etcd.yaml.confed ./manifest/etcd.yaml
 }
 
 config_apiserver()
 {
-	sed "s/host_ip/$host_ip/g;s/cluster_ip_range/$cluster_ip_range/g" ./conf/kube-apiserver.conf > ./conf/kube-apiserver.conf.confed
-	mv ./conf/kube-apiserver.conf.confed ./conf/kube-apiserver.conf
+	sed "s/host_ip/$host_ip/g;s/cluster_ip_range/$cluster_ip_range/g" ./manifest/kube-apiserver.yaml > ./manifest/kube-apiserver.yaml.confed
+	mv ./manifest/kube-apiserver.yaml.confed ./manifest/kube-apiserver.yaml
 }
 
 
 config_controllermanager()
 {
-	sed "s/host_ip/$host_ip/g" ./conf/kube-controller-manager.conf > ./conf/kube-controller-manager.conf.confed
-	mv ./conf/kube-controller-manager.conf.confed ./conf/kube-controller-manager.conf
+	sed "s/host_ip/$host_ip/g" ./manifest/kube-controller-manager.yaml > ./manifest/kube-controller-manager.yaml.confed
+	mv ./manifest/kube-controller-manager.yaml.confed ./manifest/kube-controller-manager.yaml
 }
 
 config_scheduler()
 {
-	sed "s/host_ip/$host_ip/g" ./conf/kube-scheduler.conf > ./conf/kube-scheduler.conf.confed
-	mv ./conf/kube-scheduler.conf.confed ./conf/kube-scheduler.conf
+	sed "s/host_ip/$host_ip/g" ./manifest/kube-scheduler.yaml > ./manifest/kube-scheduler.yaml.confed
+	mv ./manifest/kube-scheduler.yaml.confed ./manifest/kube-scheduler.yaml
+}
+
+
+cp_manifest()
+{
+	cp ./manifest/*  /etc/kubernetes/manifest/
 }
 
 start_kubelet()
@@ -105,5 +111,6 @@ config_apiserver
 config_controllermanager
 config_scheduler
 create_image
+cp_manifest
 start_kubelet
 install_kubectl

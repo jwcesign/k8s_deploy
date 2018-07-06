@@ -1,264 +1,44 @@
-## k8s 1.10搭建问题
+## k8s 1.10 定制自动化搭建
 
-### master节点
-
-* 将etcd  etcdctl  kube-apiserver  kube-controller-manager  kubectl  kube-scheduler二进制文件复制到master节点
-
-#### ectd服务
-* etcd.service
-~~~
-[Unit]
-Description=etcd.service
-[Service]
-Type=notify
-TimeoutStartSec=0
-Restart=always
-WorkingDirectory=/var/lib/etcd
-EnvironmentFile=/usr/src/k8s19/master/conf/etcd.conf
-ExecStart=/usr/src/k8s19/master/bin/etcd
-[Install]
-WantedBy=multi-user.target
-~~~
-
-* etcd.conf
-~~~
-ETCD_NAME=ETCD Server
-ETCD_DATA_DIR="/var/lib/etcd/"
-ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
-ETCD_ADVERTISE_CLIENT_URLS="http://127.0.0.1:2379"
-~~~
-
-* 其他可配置参数
-~~~
-等待补充
-~~~
-
-####  kube-apiserver
-* kube-apiserver.service
-~~~
-[Unit]
-Description=Kubernetes API Server
-After=etcd.service
-Wants=etcd.service
-
-[Service]
-EnvironmentFile=/usr/src/k8s19/master/conf/apiserver
-ExecStart=/usr/src/k8s19/master/bin/kube-apiserver  \
-        $KUBE_ETCD_SERVERS \
-        $KUBE_API_ADDRESS \
-        $KUBE_API_PORT \
-        $KUBE_SERVICE_ADDRESSES \
-        $KUBE_ADMISSION_CONTROL \
-        $KUBE_API_LOG \
-        $KUBE_API_ARGS
-Restart=on-failure
-Type=notify
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
-~~~
-
-* apiserver
-~~~
-UBE_API_ADDRESS="--insecure-bind-address=0.0.0.0"
-KUBE_API_PORT="--insecure-port=8080"
-KUBE_ETCD_SERVERS="--etcd-servers=http://127.0.0.1:2379"
-KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=10.10.10.0/24"
-KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,LimitRanger,ResourceQuota"
-KUBE_API_LOG="--logtostderr=false --log-dir=/home/k8s-t/log/kubernets --v=2"
-KUBE_API_ARGS=" "
-~~~
-
-* 其他可配置参数
-~~~
-等待补充
-~~~
-
-#### kube-scheduler
-* kube-scheduler.service
-~~~
-[Unit]
-Description=Kubernetes Scheduler
-After=kube-apiserver.service
-Requires=kube-apiserver.service
-
-[Service]
-User=root
-EnvironmentFile=/usr/src/k8s19/master/conf/scheduler
-ExecStart=/usr/src/k8s19/master/bin/kube-scheduler \
-        $KUBE_MASTER \
-        $KUBE_SCHEDULER_ARGS
-Restart=on-failure
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
-~~~
-
-* scheduler
-~~~
-KUBE_MASTER="--master=http://127.0.0.1:8080"
-KUBE_SCHEDULER_ARGS="--logtostderr=true --log-dir=/home/k8s-t/log/kubernetes --v=2"
-~~~
-
-* 其他可配置参数
-~~~
-等待补充
-~~~
-
-#### kube-controller-manager
-* kube-controller-manager.service
-~~~
-[Unit]
-Description=Kubernetes Scheduler
-After=kube-apiserver.service
-Requires=kube-apiserver.service
-
-[Service]
-EnvironmentFile=/usr/src/k8s19/master/conf/controller-manager
-ExecStart=/usr/src/k8s19/master/bin/kube-controller-manager \
-        $KUBE_MASTER \
-        $KUBE_CONTROLLER_MANAGER_ARGS
-Restart=on-failure
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
-~~~
-
-* controller-manager
-~~~
-KUBE_MASTER="--master=http://127.0.0.1:8080"
-KUBE_CONTROLLER_MANAGER_ARGS=" "
-~~~
-
-* 其他可配置参数
-~~~
-等待补充
-~~~
-
-#### 启动脚本
-
-* start.sh
-~~~
-systemctl daemon-reload
-systemctl enable kube-apiserver.service
-systemctl start kube-apiserver.service
-systemctl enable kube-controller-manager.service
-systemctl start kube-controller-manager.service
-systemctl enable kube-scheduler.service
-systemctl start kube-scheduler.service
-systemctl status kube-apiserver.service
-systemctl status kube-controller-manager.service
-systemctl status kube-scheduler.service
-~~~
-
-* stop.sh
-~~~
-systemctl stop kube-scheduler
-systemctl stop kube-controller-manager
-systemctl stop kube-apiserver
-systemctl status kube-apiserver.service
-systemctl status kube-controller-manager.service
-systemctl status kube-scheduler.service
-~~~
+### 主要文件
+* binary-file: 二进制文件，由于二进制文件过大，此处通过脚本获取（wget）
+* conf: 各组件的配置文件，后面可以自动添加相关的参数
+* dockerfile: 把各组件打包为容器的dockerfile，基础镜像是busybox，后面可以利用更纯净的镜像
+* manifest: 各组件的manifest文件，里面可以定制化一些k8s支持的特性，注意不同版本支持特性不一样
+* master_init.sh: master安装脚本，实现了各组件的容器化，可以自己填入一些参数，如dns ip, cluster ip等。
+* node_init.sh：脚本以完善，用以在node上安装kubelet与docker，并加入集群。
+* master_init_node.sh：通过master脚本初始化node节点，并让它加入集群，通过远程命令执行。
 
 
-### node节点
-* 将kubectl  kubelet  kube-proxy复制到node节点
+###  注意点
+* master_install.sh脚本中的***get_ip***函数根据不同主机可能需要更改正则表达式
+* binary-file中的获取二进制文件地址可以设置，建议替换为内网的文件，要不然会比较慢
+* 实时运行日志输出位置可以修改manifest中的配置文件
+* node_init.sh脚本暂时不能用，需要手动设置master ip
+* 有些k8s 1.5的启动参数在1.10中已经不建议使用,建议看官方文档的显示的启动参数
 
-#### kubelet
-* kubelet.service
-~~~
-[Unit]
-Description=Kubernetes Kubelet Server
-Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-After=docker.service
-Requires=docker.service
+### 最新k8s 各组件启动参数链接
+* kubelet: [link](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)
+* kube-apiserver: [link](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/)
+* kube-controller-manager: [link](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/)
+* kube-scheduler: [link](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/)
+* kube-proxy: [link](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/)
+* etcd: [link](https://github.com/coreos/etcd/blob/master/Documentation/op-guide/configuration.md)
 
-[Service]
-WorkingDirectory=/var/lib/kubelet
-EnvironmentFile=/usr/src/k8s19/node/conf/kubelet
-ExecStart=/usr/src/k8s19/node/bin/kubelet $KUBELET_ARGS
-Restart=on-failure
-KillMode=process
+### 等待改进
+* 脚本参数不完善，只能搭建基本的环境
+* 基础镜像可以自己制作，可以达到比busybox更小的体积
 
-[Install]
-WantedBy=multi-user.target
-~~~
+### 提示
+* 如果需要重新安装，直接把etcd的数据文件删除，重新运行脚本即可
+* 如果需要升级，先下载二进制，然后制作dockerfile，然后替换manifest文件，最后替换kubelet
+* 脚本比较简单，看一下就是做什么的了，后面可能要根据实际环境，线上线下等修改代码
 
-* kubelet
-~~~
-KUBELET_ARGS="--cgroup-driver=systemd --address=10.13.130.78 --port=10250 --hostname-override=10.13.130.78 --allow-privileged=false --kubeconfig=/usr/src/k8s19/node/conf/kubelet.kubeconfig --cluster-dns=10.10.10.2 --cluster-domain=cluster.local --fail-swap-on=false --logtostderr=true --log-dir=/var/log/kubernetes --v=2"
-~~~
+### 安装
+* 直接运行master_install.sh安装节点
+* node_init.sh还没实现自动化，因为需要设置master ip，暂时不建议用
 
-* 其他可配置参数
-~~~
-等待补充
-~~~
-
-
-#### kube-proxy
-* kube-proxy.service
-~~~
-[Unit]
-Description=Kubernetes Kube-proxy Server
-Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-After=network.service
-Requires=network.service
-
-[Service]
-EnvironmentFile=/usr/src/k8s19/node/conf/proxy
-ExecStart=/usr/src/k8s19/node/bin/kube-proxy $KUBE_PROXY_ARGS
-Restart=on-failure
-LimitNOFILE=65536
-KillMode=process
-
-[Install]
-WantedBy=multi-user.target
-~~~
-
-* proxy
-~~~
-KUBE_PROXY_ARGS="--master=http://10.13.130.78:8080 --hostname-override=10.13.130.78 --logtostderr=true --log-dir=/var/log/kubernetes --v=4"
-~~~
-
-* 其他可配置参数
-~~~
-等待补充
-~~~
-
-#### 启动脚本
-
-* start.sh
-~~~
-systemctl start kubelet
-systemctl start kube-proxy
-systemctl status kubelet
-systemctl status kube-proxy
-~~~
-
-* stop.sh
-~~~
-systemctl stop kubelet
-systemctl stop kube-proxy
-systemctl status kube-proxy
-systemctl status kubelet
-~~~
-
-## 容器化安装
-* 安装主脚本：master_install.sh
-* manifest文件夹：各主机的yaml文件，可以修改以定制启动参数
-* dockerfile：docker build的各组件的dockerfile
-* conf: 各组件的启动参数设置
-* binary-file：获取各组件
-* master_init.sh: 初始化master节点
-* master_init_node.sh: 通过master节点初始化node节点
-* ascp,assh: 自动复制文件到node与执行初始化脚本
-* 脚本比较简单，一看就懂，如果需要定制化脚本，可以自己添加类容
-
-## 通过maaster节点初始化node节点
+## 通过master节点初始化node节点
 * 通过设置master_init_node.sh中的node节点的用户名，密码与ip，即可运行并把改节点加入集群
 * 后面可以通过一些手段使其自动化
 * 整个集群没有打通不同节点的pod与pod之间的网络
